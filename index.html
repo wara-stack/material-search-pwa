@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Material Search</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1976d2">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>Material Search</h1>
+
+    <div id="status">
+        No Database Loaded
+    </div>
+
+    <br>
+
+    <input
+        type="file"
+        id="dbFile"
+        accept=".db,.sqlite"
+    >
+
+    <button onclick="loadDatabase()">
+        Load Database
+    </button>
+
+    <br><br>
+
+    <input
+        type="text"
+        id="searchText"
+        placeholder="Enter Material Code or Description"
+    >
+
+    <button onclick="searchMaterial()">
+        Search
+    </button>
+
+    <br><br>
+
+    <div id="results"></div>
+
+    <script src="sql-wasm.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>
