@@ -1,7 +1,7 @@
 let db;
 
 /* ---------------------------
-   Auto Load Saved Database
+   Page Load
 ---------------------------- */
 
 window.addEventListener("load", async () => {
@@ -28,7 +28,6 @@ window.addEventListener("load", async () => {
     }
 
 });
-
 
 
 /* ---------------------------
@@ -97,9 +96,8 @@ async function loadDatabase() {
 }
 
 
-
 /* ---------------------------
-   Save DB To Browser Storage
+   Save Database
 ---------------------------- */
 
 function saveDatabaseToIndexedDB(buffer) {
@@ -155,9 +153,8 @@ function saveDatabaseToIndexedDB(buffer) {
 }
 
 
-
 /* ---------------------------
-   Auto Load Saved DB
+   Auto Load Database
 ---------------------------- */
 
 async function loadSavedDatabase() {
@@ -200,9 +197,7 @@ async function loadSavedDatabase() {
 
         const req =
             tx.objectStore("files")
-              .get(
-                  "materials"
-              );
+              .get("materials");
 
         req.onsuccess =
             async function() {
@@ -233,16 +228,11 @@ async function loadSavedDatabase() {
             ).innerHTML =
             "✅ Database Auto Loaded";
 
-            console.log(
-                "Database loaded from browser storage."
-            );
-
         };
 
     };
 
 }
-
 
 
 /* ---------------------------
@@ -273,8 +263,33 @@ function searchMaterial() {
 
     try {
 
-        const stmt =
-            db.prepare(`
+        const words =
+            searchText
+            .split(/\s+/)
+            .filter(w => w.length > 0);
+
+        let whereClauses = [];
+        let params = [];
+
+        words.forEach(word => {
+
+            whereClauses.push(`
+            (
+                code LIKE ?
+                OR short_desc LIKE ?
+                OR long_desc LIKE ?
+            )
+            `);
+
+            const term = `%${word}%`;
+
+            params.push(term);
+            params.push(term);
+            params.push(term);
+
+        });
+
+        const query = `
             SELECT
                 code,
                 short_desc,
@@ -282,29 +297,25 @@ function searchMaterial() {
                 status
             FROM materials
             WHERE
-                code LIKE ?
-                OR short_desc LIKE ?
-                OR long_desc LIKE ?
+                ${whereClauses.join(" AND ")}
             LIMIT 100
-        `);
+        `;
 
-        const searchTerm =
-            `%${searchText}%`;
+        const stmt =
+            db.prepare(query);
 
-        stmt.bind([
-            searchTerm,
-            searchTerm,
-            searchTerm
-        ]);
+        stmt.bind(params);
 
         let html = `
+            <p><b>Searching:</b> ${searchText}</p>
+
             <table border="1" cellpadding="5">
-            <tr>
-                <th>Code</th>
-                <th>Short Desc</th>
-                <th>Long Desc</th>
-                <th>Status</th>
-            </tr>
+                <tr>
+                    <th>Code</th>
+                    <th>Short Desc</th>
+                    <th>Long Desc</th>
+                    <th>Status</th>
+                </tr>
         `;
 
         let count = 0;
@@ -315,29 +326,36 @@ function searchMaterial() {
                 stmt.getAsObject();
 
             html += `
-            <tr>
-                <td>${row.code || ""}</td>
-                <td>${row.short_desc || ""}</td>
-                <td>${row.long_desc || ""}</td>
-                <td>${row.status || ""}</td>
-            </tr>
+                <tr>
+                    <td>${row.code || ""}</td>
+                    <td>${row.short_desc || ""}</td>
+                    <td>${row.long_desc || ""}</td>
+                    <td>${row.status || ""}</td>
+                </tr>
             `;
 
             count++;
-
         }
 
         stmt.free();
 
         html += "</table>";
 
-        if (count === 0)
-            html =
-                "<p>No results found.</p>";
+        if (count === 0) {
 
-        document.getElementById(
-            "results"
-        ).innerHTML =
+            html =
+                `<p>No results found for <b>${searchText}</b></p>`;
+
+        } else {
+
+            html =
+                `<p><b>${count}</b> results found</p>`
+                + html;
+        }
+
+        document
+            .getElementById("results")
+            .innerHTML =
             html;
 
     }
@@ -345,18 +363,17 @@ function searchMaterial() {
 
         console.error(err);
 
-        document.getElementById(
-            "results"
-        ).innerHTML =
+        document
+            .getElementById("results")
+            .innerHTML =
             "<p>Search failed.</p>";
     }
 
 }
 
 
-
 /* ---------------------------
-   Reset Saved Database
+   Reset Database
 ---------------------------- */
 
 function clearDatabase() {
