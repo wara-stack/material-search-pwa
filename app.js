@@ -242,31 +242,23 @@ async function loadSavedDatabase() {
 function searchMaterial() {
 
     if (!db) {
-
-        alert(
-            "Load database first."
-        );
-
+        alert("Load database first.");
         return;
     }
 
-    const searchText =
-        document
-        .getElementById(
-            "searchText"
-        )
+    const searchText = document
+        .getElementById("searchText")
         .value
-        .trim();
+        .trim()
+        .toLowerCase();
 
-    if (searchText === "")
-        return;
+    if (!searchText) return;
 
     try {
 
-        const words =
-            searchText
+        const words = searchText
             .split(/\s+/)
-            .filter(w => w.length > 0);
+            .filter(word => word.length > 0);
 
         let whereClauses = [];
         let params = [];
@@ -274,11 +266,9 @@ function searchMaterial() {
         words.forEach(word => {
 
             whereClauses.push(`
-            (
-                code LIKE ?
-                OR short_desc LIKE ?
-                OR long_desc LIKE ?
-            )
+                LOWER(COALESCE(code,'')) LIKE ?
+                OR LOWER(COALESCE(short_desc,'')) LIKE ?
+                OR LOWER(COALESCE(long_desc,'')) LIKE ?
             `);
 
             const term = `%${word}%`;
@@ -286,7 +276,6 @@ function searchMaterial() {
             params.push(term);
             params.push(term);
             params.push(term);
-
         });
 
         const query = `
@@ -297,18 +286,20 @@ function searchMaterial() {
                 status
             FROM materials
             WHERE
-                ${whereClauses.join(" AND ")}
+            (
+                ${whereClauses.map(c => `(${c})`).join(" AND ")}
+            )
             LIMIT 100
         `;
 
-        const stmt =
-            db.prepare(query);
+        console.log(query);
+        console.log(params);
 
+        const stmt = db.prepare(query);
         stmt.bind(params);
 
         let html = `
-            <p><b>Searching:</b> ${searchText}</p>
-
+            <p><b>${searchText}</b></p>
             <table border="1" cellpadding="5">
                 <tr>
                     <th>Code</th>
@@ -322,8 +313,7 @@ function searchMaterial() {
 
         while (stmt.step()) {
 
-            const row =
-                stmt.getAsObject();
+            const row = stmt.getAsObject();
 
             html += `
                 <tr>
@@ -339,36 +329,24 @@ function searchMaterial() {
 
         stmt.free();
 
-        html += "</table>";
+        html += `</table>`;
 
         if (count === 0) {
-
-            html =
-                `<p>No results found for <b>${searchText}</b></p>`;
-
+            html = `<p>No results found for <b>${searchText}</b></p>`;
         } else {
-
-            html =
-                `<p><b>${count}</b> results found</p>`
-                + html;
+            html = `<p><b>${count}</b> results found</p>` + html;
         }
 
-        document
-            .getElementById("results")
-            .innerHTML =
-            html;
+        document.getElementById("results").innerHTML = html;
 
     }
     catch (err) {
 
         console.error(err);
 
-        document
-            .getElementById("results")
-            .innerHTML =
+        document.getElementById("results").innerHTML =
             "<p>Search failed.</p>";
     }
-
 }
 
 
