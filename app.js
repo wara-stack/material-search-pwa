@@ -243,79 +243,63 @@ async function loadSavedDatabase() {
    Code Search
 ---------------------------- */
 
-function searchCode() {
+function searchMaterial() {
 
     if (!db) {
         alert("Load database first.");
         return;
     }
 
-    const searchText = document
-        .getElementById("searchText")
+    const codeText =
+        document.getElementById("codeSearch")
         .value
         .trim()
         .toLowerCase();
 
-    if (!searchText) return;
-
-    const query = `
-        SELECT
-            code,
-            short_desc,
-            long_desc,
-            status
-        FROM materials
-        WHERE LOWER(COALESCE(code,'')) LIKE ?
-        LIMIT 500
-    `;
-
-    const stmt = db.prepare(query);
-
-    stmt.bind([`%${searchText}%`]);
-
-    displayResults(stmt, searchText);
-}
-
-
-/* ---------------------------
-   Description Search
----------------------------- */
-
-function searchDescription() {
-
-    if (!db) {
-        alert("Load database first.");
-        return;
-    }
-
-    const searchText = document
-        .getElementById("searchText")
+    const descText =
+        document.getElementById("descSearch")
         .value
         .trim()
         .toLowerCase();
-
-    if (!searchText) return;
-
-    const words = searchText
-        .split(/\s+/)
-        .filter(word => word.length > 0);
 
     let whereClauses = [];
     let params = [];
 
-    words.forEach(word => {
+    if (codeText !== "") {
 
-        whereClauses.push(`
-            (
-                LOWER(COALESCE(short_desc,'')) LIKE ?
-                OR
-                LOWER(COALESCE(long_desc,'')) LIKE ?
-            )
-        `);
+        whereClauses.push(
+            "LOWER(COALESCE(code,'')) LIKE ?"
+        );
 
-        params.push(`%${word}%`);
-        params.push(`%${word}%`);
-    });
+        params.push(`%${codeText}%`);
+    }
+
+    if (descText !== "") {
+
+        const words = descText
+            .split(/\s+/)
+            .filter(w => w.length > 0);
+
+        words.forEach(word => {
+
+            whereClauses.push(`
+                (
+                    LOWER(COALESCE(short_desc,'')) LIKE ?
+                    OR
+                    LOWER(COALESCE(long_desc,'')) LIKE ?
+                )
+            `);
+
+            params.push(`%${word}%`);
+            params.push(`%${word}%`);
+
+        });
+    }
+
+    if (whereClauses.length === 0) {
+        alert("Enter search criteria.");
+        return;
+    }
 
     const query = `
         SELECT
@@ -333,9 +317,11 @@ function searchDescription() {
 
     stmt.bind(params);
 
-    displayResults(stmt, searchText);
+    displayResults(
+        stmt,
+        `${codeText} ${descText}`
+    );
 }
-
 
 /* ---------------------------
    Display Results
@@ -442,7 +428,7 @@ document.addEventListener("DOMContentLoaded", function () {
             function (event) {
 
                 if (event.key === "Enter") {
-                    searchCode();
+                    searchMaterial();
                 }
 
             }
