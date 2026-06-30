@@ -1,69 +1,104 @@
-body{
+body {
 
-font-family: Arial;
-
-margin:20px;
-
-}
-
-#search{
-
-width:100%;
-
-padding:10px;
-
-font-size:16px;
+    font-family: Arial, sans-serif;
+    margin: 20px;
 
 }
 
-table{
+h1 {
+    margin-bottom: 10px;
+}
 
-border-collapse:collapse;
+#status {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
 
-width:100%;
+.search-container {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.search-field {
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-field label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#codeSearch,
+#descSearch {
+
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
 
 }
 
-th,td{
+button {
 
-border:1px solid #ccc;
-
-padding:6px;
-
-text-align:left;
+    padding: 8px 12px;
+    cursor: pointer;
+    margin-right: 5px;
 
 }
 
-th{
+table {
 
-background:#eee;
+    border-collapse: collapse;
+    width: 100%;
+
+}
+
+th,
+td {
+
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: left;
+
+}
+
+th {
+
+    background: #eee;
 
 }
 
 .result-card {
+
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 10px;
     margin-bottom: 10px;
     background: #f8f8f8;
     word-wrap: break-word;
+
 }
 
 .result-card div {
+
     margin-bottom: 4px;
-}
 
-#searchText {
-    width: 350px;
-    max-width: 90%;
-    padding: 8px;
-}
-
-button {
-    padding: 8px 12px;
-    cursor: pointer;
 }
 
 #results {
+
     margin-top: 15px;
+
+}
+
+@media (max-width: 768px) {
+
+    .search-container {
+
+        flex-direction: column;
+
+    }
+
 }
