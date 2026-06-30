@@ -239,7 +239,11 @@ async function loadSavedDatabase() {
    Search
 ---------------------------- */
 
-function searchMaterial() {
+/* ---------------------------
+   Code Search
+---------------------------- */
+
+function searchCode() {
 
     if (!db) {
         alert("Load database first.");
@@ -254,90 +258,125 @@ function searchMaterial() {
 
     if (!searchText) return;
 
-    try {
+    const query = `
+        SELECT
+            code,
+            short_desc,
+            long_desc,
+            status
+        FROM materials
+        WHERE LOWER(COALESCE(code,'')) LIKE ?
+        LIMIT 500
+    `;
 
-        const words = searchText
-            .split(/\s+/)
-            .filter(word => word.length > 0);
+    const stmt = db.prepare(query);
 
-        let whereClauses = [];
-        let params = [];
+    stmt.bind([`%${searchText}%`]);
 
-        words.forEach(word => {
+    displayResults(stmt, searchText);
+}
 
-            whereClauses.push(`
-                (
-                    LOWER(COALESCE(code,'')) LIKE ?
-                    OR LOWER(COALESCE(short_desc,'')) LIKE ?
-                    OR LOWER(COALESCE(long_desc,'')) LIKE ?
-                )
-            `);
 
-            const term = `%${word}%`;
+/* ---------------------------
+   Description Search
+---------------------------- */
 
-            params.push(term);
-            params.push(term);
-            params.push(term);
-        });
+function searchDescription() {
 
-        const query = `
-            SELECT
-                code,
-                short_desc,
-                long_desc,
-                status
-            FROM materials
-            WHERE
-                ${whereClauses.join(" AND ")}
-            LIMIT 500
+    if (!db) {
+        alert("Load database first.");
+        return;
+    }
+
+    const searchText = document
+        .getElementById("searchText")
+        .value
+        .trim()
+        .toLowerCase();
+
+    if (!searchText) return;
+
+    const words = searchText
+        .split(/\s+/)
+        .filter(word => word.length > 0);
+
+    let whereClauses = [];
+    let params = [];
+
+    words.forEach(word => {
+
+        whereClauses.push(`
+            (
+                LOWER(COALESCE(short_desc,'')) LIKE ?
+                OR
+                LOWER(COALESCE(long_desc,'')) LIKE ?
+            )
+        `);
+
+        params.push(`%${word}%`);
+        params.push(`%${word}%`);
+    });
+
+    const query = `
+        SELECT
+            code,
+            short_desc,
+            long_desc,
+            status
+        FROM materials
+        WHERE
+            ${whereClauses.join(" AND ")}
+        LIMIT 500
+    `;
+
+    const stmt = db.prepare(query);
+
+    stmt.bind(params);
+
+    displayResults(stmt, searchText);
+}
+
+
+/* ---------------------------
+   Display Results
+---------------------------- */
+
+function displayResults(stmt, searchText) {
+
+    let html = "";
+    let count = 0;
+
+    while (stmt.step()) {
+
+        const row = stmt.getAsObject();
+
+        html += `
+            <div class="result-card">
+                <div><b>Code:</b> ${row.code || ""}</div>
+                <div><b>Short Desc:</b> ${row.short_desc || ""}</div>
+                <div><b>Long Desc:</b> ${row.long_desc || ""}</div>
+                <div><b>Status:</b> ${row.status || ""}</div>
+            </div>
         `;
 
-        const stmt = db.prepare(query);
-        stmt.bind(params);
-
-        let html = "";
-        let count = 0;
-
-        while (stmt.step()) {
-
-            const row = stmt.getAsObject();
-
-            html += `
-                <div class="result-card">
-                    <div><b>Code:</b> ${row.code || ""}</div>
-                    <div><b>Short Desc:</b> ${row.short_desc || ""}</div>
-                    <div><b>Long Desc:</b> ${row.long_desc || ""}</div>
-                    <div><b>Status:</b> ${row.status || ""}</div>
-                </div>
-            `;
-
-            count++;
-        }
-
-        stmt.free();
-
-        if (count === 0) {
-
-            html =
-                `<p>No results found for <b>${searchText}</b></p>`;
-
-        } else {
-
-            html =
-                `<p><b>${count}</b> results found (max 500 shown)</p>` +
-                html;
-        }
-
-        document.getElementById("results").innerHTML = html;
-
+        count++;
     }
-    catch (err) {
 
-        console.error(err);
+    stmt.free();
 
-        document.getElementById("results").innerHTML =
-            "<p>Search failed.</p>";
+    if (count === 0) {
+
+        html =
+            `<p>No results found for <b>${searchText}</b></p>`;
+
+    } else {
+
+        html =
+            `<p><b>${count}</b> results found (max 500 shown)</p>` +
+            html;
     }
+
+    document.getElementById("results").innerHTML = html;
 }
 
 
