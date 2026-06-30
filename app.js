@@ -442,7 +442,7 @@ document.addEventListener("DOMContentLoaded", function () {
             function (event) {
 
                 if (event.key === "Enter") {
-                    searchMaterial();
+                    searchCode();
                 }
 
             }
@@ -450,4 +450,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+});
 });
