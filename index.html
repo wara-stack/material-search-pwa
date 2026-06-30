@@ -39,29 +39,31 @@
 
     <h3>Search Materials</h3>
 
-<label><b>Material Code</b></label>
+<div class="search-container">
+
+    <div class="search-field">
+        <label><b>Material Code</b></label>
+        <input
+            type="text"
+            id="codeSearch"
+            placeholder="e.g. M39"
+            autocomplete="off"
+        >
+    </div>
+
+    <div class="search-field">
+        <label><b>Description</b></label>
+        <input
+            type="text"
+            id="descSearch"
+            placeholder="e.g. seal ring"
+            autocomplete="off"
+        >
+    </div>
+
+</div>
+
 <br>
-
-<input
-    type="text"
-    id="codeSearch"
-    placeholder="e.g. M39"
-    autocomplete="off"
->
-
-<br><br>
-
-<label><b>Description</b></label>
-<br>
-
-<input
-    type="text"
-    id="descSearch"
-    placeholder="e.g. seal ring"
-    autocomplete="off"
->
-
-<br><br>
 
 <button onclick="searchMaterial()">
     Search
