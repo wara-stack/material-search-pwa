@@ -302,16 +302,17 @@ function searchMaterial() {
     }
 
     const query = `
-        SELECT
-            code,
-            short_desc,
-            long_desc,
-            status
-        FROM materials
-        WHERE
-            ${whereClauses.join(" AND ")}
-        LIMIT 500
-    `;
+    SELECT
+        code,
+        short_desc,
+        long_desc,
+        status
+    FROM materials
+    WHERE
+        ${whereClauses.join(" AND ")}
+    ORDER BY code
+    LIMIT 1000
+`;
 
     const stmt = db.prepare(query);
 
