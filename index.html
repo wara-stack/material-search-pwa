@@ -39,27 +39,43 @@
 
     <h3>Search Materials</h3>
 
-    <input
-        type="text"
-        id="searchText"
-        placeholder="Enter Material Code or Description"
-        autocomplete="off"
-    >
+<label><b>Material Code</b></label>
+<br>
 
-    <button onclick="searchCode()">
-        Search Code
-    </button>
+<input
+    type="text"
+    id="codeSearch"
+    placeholder="e.g. M39"
+    autocomplete="off"
+>
 
-    <button onclick="searchDescription()">
-        Search Description
-    </button>
+<br><br>
 
-    <p>
-        <b>Search Code:</b> Finds matching material codes.<br>
-        <b>Search Description:</b> Searches Short Description and Long Description (word order does not matter).
-    </p>
+<label><b>Description</b></label>
+<br>
 
-    <hr>
+<input
+    type="text"
+    id="descSearch"
+    placeholder="e.g. seal ring"
+    autocomplete="off"
+>
+
+<br><br>
+
+<button onclick="searchMaterial()">
+    Search
+</button>
+
+<p>
+    Search will return materials where:
+    <br>
+    • Code contains the Material Code text
+    <br>
+    • Description contains all words entered in Description
+</p>
+
+<hr>
 
     <div id="results"></div>
 
