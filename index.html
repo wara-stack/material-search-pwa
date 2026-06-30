@@ -35,23 +35,31 @@
         Reset Database
     </button>
 
-    <br><br>
+    <hr>
+
+    <h3>Search Materials</h3>
 
     <input
         type="text"
         id="searchText"
         placeholder="Enter Material Code or Description"
+        autocomplete="off"
     >
 
-   <button onclick="searchCode()">
-    Search Code
-</button>
+    <button onclick="searchCode()">
+        Search Code
+    </button>
 
-<button onclick="searchDescription()">
-    Search Description
-</button>
+    <button onclick="searchDescription()">
+        Search Description
+    </button>
 
-    <br><br>
+    <p>
+        <b>Search Code:</b> Finds matching material codes.<br>
+        <b>Search Description:</b> Searches Short Description and Long Description (word order does not matter).
+    </p>
+
+    <hr>
 
     <div id="results"></div>
 
