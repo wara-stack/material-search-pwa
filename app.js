@@ -266,9 +266,11 @@ function searchMaterial() {
         words.forEach(word => {
 
             whereClauses.push(`
-                LOWER(COALESCE(code,'')) LIKE ?
-                OR LOWER(COALESCE(short_desc,'')) LIKE ?
-                OR LOWER(COALESCE(long_desc,'')) LIKE ?
+                (
+                    LOWER(COALESCE(code,'')) LIKE ?
+                    OR LOWER(COALESCE(short_desc,'')) LIKE ?
+                    OR LOWER(COALESCE(long_desc,'')) LIKE ?
+                )
             `);
 
             const term = `%${word}%`;
@@ -286,29 +288,14 @@ function searchMaterial() {
                 status
             FROM materials
             WHERE
-            (
-                ${whereClauses.map(c => `(${c})`).join(" AND ")}
-            )
-            LIMIT 100
+                ${whereClauses.join(" AND ")}
+            LIMIT 500
         `;
-
-        console.log(query);
-        console.log(params);
 
         const stmt = db.prepare(query);
         stmt.bind(params);
 
-        let html = `
-            <p><b>${searchText}</b></p>
-            <table border="1" cellpadding="5">
-                <tr>
-                    <th>Code</th>
-                    <th>Short Desc</th>
-                    <th>Long Desc</th>
-                    <th>Status</th>
-                </tr>
-        `;
-
+        let html = "";
         let count = 0;
 
         while (stmt.step()) {
@@ -316,12 +303,12 @@ function searchMaterial() {
             const row = stmt.getAsObject();
 
             html += `
-                <tr>
-                    <td>${row.code || ""}</td>
-                    <td>${row.short_desc || ""}</td>
-                    <td>${row.long_desc || ""}</td>
-                    <td>${row.status || ""}</td>
-                </tr>
+                <div class="result-card">
+                    <div><b>Code:</b> ${row.code || ""}</div>
+                    <div><b>Short Desc:</b> ${row.short_desc || ""}</div>
+                    <div><b>Long Desc:</b> ${row.long_desc || ""}</div>
+                    <div><b>Status:</b> ${row.status || ""}</div>
+                </div>
             `;
 
             count++;
@@ -329,12 +316,16 @@ function searchMaterial() {
 
         stmt.free();
 
-        html += `</table>`;
-
         if (count === 0) {
-            html = `<p>No results found for <b>${searchText}</b></p>`;
+
+            html =
+                `<p>No results found for <b>${searchText}</b></p>`;
+
         } else {
-            html = `<p><b>${count}</b> results found</p>` + html;
+
+            html =
+                `<p><b>${count}</b> results found (max 500 shown)</p>` +
+                html;
         }
 
         document.getElementById("results").innerHTML = html;
@@ -395,3 +386,29 @@ function clearDatabase() {
     };
 
 }
+
+/* ---------------------------
+   Enter Key Search
+---------------------------- */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchBox =
+        document.getElementById("searchText");
+
+    if (searchBox) {
+
+        searchBox.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+                    searchMaterial();
+                }
+
+            }
+        );
+
+    }
+
+});
