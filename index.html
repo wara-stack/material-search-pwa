@@ -39,45 +39,47 @@
 
     <h3>Search Materials</h3>
 
-<div class="search-container">
+    <div class="search-container">
 
-    <div class="search-field">
-        <label><b>Material Code</b></label>
-        <input
-            type="text"
-            id="codeSearch"
-            placeholder="e.g. M39"
-            autocomplete="off"
-        >
+        <div class="search-field">
+            <label><b>Material Code</b></label>
+            <input
+                type="text"
+                id="codeSearch"
+                placeholder="e.g. M39"
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="search-field">
+            <label><b>Description</b></label>
+            <input
+                type="text"
+                id="descSearch"
+                placeholder="e.g. seal ring"
+                autocomplete="off"
+            >
+        </div>
+
     </div>
 
-    <div class="search-field">
-        <label><b>Description</b></label>
-        <input
-            type="text"
-            id="descSearch"
-            placeholder="e.g. seal ring"
-            autocomplete="off"
-        >
-    </div>
-
-</div>
-
-<br>
-
-<button onclick="searchMaterial()">
-    Search
-</button>
-
-<p>
-    Search will return materials where:
     <br>
-    • Code contains the Material Code text
-    <br>
-    • Description contains all words entered in Description
-</p>
 
-<hr>
+    <button onclick="searchMaterial()">
+        Search
+    </button>
+
+    <p>
+        Enter a Material Code, a Description, or both.
+        <br>
+        Example:
+        <br>
+        Material Code = M39
+        <br>
+        Description = seal ring
+    </p>
+
+    <hr>
 
     <div id="results"></div>
 
