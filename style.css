@@ -39,3 +39,31 @@ th{
 background:#eee;
 
 }
+
+.result-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #f8f8f8;
+    word-wrap: break-word;
+}
+
+.result-card div {
+    margin-bottom: 4px;
+}
+
+#searchText {
+    width: 350px;
+    max-width: 90%;
+    padding: 8px;
+}
+
+button {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+#results {
+    margin-top: 15px;
+}
