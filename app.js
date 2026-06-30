@@ -418,23 +418,32 @@ function clearDatabase() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const searchBox =
-        document.getElementById("searchText");
+    const codeBox =
+        document.getElementById("codeSearch");
 
-    if (searchBox) {
+    const descBox =
+        document.getElementById("descSearch");
 
-        searchBox.addEventListener(
-            "keydown",
-            function (event) {
+    function handleEnter(event) {
 
-                if (event.key === "Enter") {
-                    searchMaterial();
-                }
-
-            }
-        );
+        if (event.key === "Enter") {
+            searchMaterial();
+        }
 
     }
 
-});
+    if (codeBox) {
+        codeBox.addEventListener(
+            "keydown",
+            handleEnter
+        );
+    }
 
+    if (descBox) {
+        descBox.addEventListener(
+            "keydown",
+            handleEnter
+        );
+    }
+
+});
